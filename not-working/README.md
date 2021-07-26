@@ -200,6 +200,15 @@ haproxy  | [NOTICE] 206/164929 (9) : path to executable is /opt/hapee-2.2/sbin/h
 haproxy  | [ALERT] 206/164929 (9) : backend 'headless-test' has no server available!
 ```
 
+Furthermore, I found that when running `docker run -ti ubuntu` and then `dig_headless._tcp.headless-test.infra-routing.svc.cluster.local SRV @10.128.115.161`
+resulted in the same client timeout, even when running the same commands locally (Mac OSX) still
+worked fine. I'm wondering if maybe there is some restriction somewhere on the payload size for the
+UDP packet, or maybe they just weren't able to be reconstructed since UDP DNS packets have the 8192
+byte size limit.
+
+If I run `dig _headless._tcp.headless-test.infra-routing.svc.cluster.local SRV @10.128.115.161 +tcp`
+from within the same environment (the ubuntu container), then everything resolves as expected.
+
 # Conclusion
 
 So it looks like HAPEE crashes when it times out attempting to make the DNS query.
